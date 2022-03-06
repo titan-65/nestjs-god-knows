@@ -9,12 +9,18 @@ import { PrayerModule } from './prayer/prayer.module';
 import { BibleStudyModule } from './bible-study/bible-study.module';
 import { Auth } from './auth/entities/auth.entity';
 import { User } from './users/entities/user.entity';
+import { Prayer } from './prayer/entities/prayer.entity';
 
 @Module({
   imports: [TypeOrmModule.forRoot({
-    type: 'sqlite',
-    database: 'db.sqlite',
-    entities: [Auth, User],
+    type: 'postgres',
+    host: 'localhost',
+    port: 5432,
+    username: 'postgres',
+    password: 'postgres',
+    database: 'god-knows',
+    autoLoadEntities: true,
+    // entities: [Auth, User, Prayer],
     synchronize: true,
   }), AuthModule, UsersModule, SermonModule, PrayerModule, BibleStudyModule],
   controllers: [AppController],
