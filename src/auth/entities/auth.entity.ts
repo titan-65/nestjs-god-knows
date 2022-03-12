@@ -11,7 +11,7 @@ export class Auth {
     @Column()
     lastName: string;
 
-    @Column()
+    @Column({ unique: true })
     username: string;
 
     @Column()
