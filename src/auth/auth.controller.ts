@@ -1,38 +1,65 @@
-import { Controller, Get, Post, Body, Param, NotFoundException, Put, Delete, HttpCode, HttpStatus, Redirect } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Post,
+    Body,
+    Param,
+    NotFoundException,
+    Put,
+    Delete,
+    HttpCode,
+    HttpStatus,
+    Redirect,
+    Request,
+    UseGuards,
+    HttpException
+} from '@nestjs/common';
+import { AuthGuard} from '@nestjs/passport';
 import { AuthService } from './auth.service';
-import { User } from './user.entity';
+import { User } from '../users/entities/user.entity';
 import { CreateUserDto } from '../users/dto/create-user.dto';
-import { UserService } from '../users/user.service';
+import { AuthCredentialsDto} from './dto/auth-credentials.dto';
+import { UsersService } from '../users/users.service';
+import {LocalAuthGuard} from './local-auth.guard';
+import {RegistrationStatusInterface} from './registration-status.interface';
+import {LoginUserDto} from '../users/dto/login-user.dto';
+import {LoginStatusInterface} from './login-status.interface';
 
 @Controller('auth')
 export class AuthController {
     constructor(
     private readonly authService: AuthService,
-    private readonly userService: UserService,
+    private readonly usersService: UsersService,
   ) {}
 
-  @Post('login')
-  async login(@Body() user: User) {
-    return this.authService.login(user);
-  }
-
   @Post('register')
-  async register(@Body() user: CreateUserDto) {
-    return this.userService.create(user);
+  public async register(@Body() createUserDto: CreateUserDto): Promise<RegistrationStatusInterface> {
+      const result: RegistrationStatusInterface = await this.authService.register(createUserDto);
+      if (!result.success) {
+          throw new HttpException(result.message, HttpStatus.BAD_REQUEST);
+      }
+      return result;
   }
 
-  // @Get('me')
-  // async me(@Body() user: User) {
-  //   return this.authService.me(user);
+  @Post('login')
+    public async login(@Body() loginUserDto: LoginUserDto): Promise<LoginStatusInterface> {
+        return await this.authService.login(loginUserDto);
+  }
+  // @UseGuards(LocalAuthGuard)
+  // @Post('/local/login')
+  // async loginOne(@Request() req) {
+  //     return req.user;
   // }
   //
-  // @Put('me')
-  // async update(@Body() user: User) {
-  //   return this.userService.update(user);
+  // @UseGuards(LocalAuthGuard)
+  // @Post('/login')
+  // async login(@Request() req) {
+  //     return this.authService.login(req.user);
   // }
   //
-  // @Delete('me')
-  // async delete(@Body() user: User) {
-  //   return this.userService.delete(user);
+  // @Post('signup')
+  // async register(@Body() user: AuthCredentialsDto) {
+  //   return this.usersService.createUser(user);
   // }
+
 }
