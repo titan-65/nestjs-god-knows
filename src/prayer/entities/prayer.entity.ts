@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn} from 'typeorm';
+import {User} from '../../users/entities/user.entity';
 
 @Entity()
 export class Prayer {
@@ -16,6 +17,9 @@ export class Prayer {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @ManyToOne(type => User)
+  owner: User;
 
   // @Column('simple-array')
   // tags: string[];
