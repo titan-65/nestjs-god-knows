@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, CacheModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -10,9 +10,20 @@ import { BibleStudyModule } from './bible-study/bible-study.module';
 import { Auth } from './auth/entities/auth.entity';
 import { User } from './users/entities/user.entity';
 import { Prayer } from './prayer/entities/prayer.entity';
+import {ConfigModule} from '@nestjs/config';
+import {ThrottlerModule} from '@nestjs/throttler';
 
 @Module({
-  imports: [TypeOrmModule.forRoot({
+  imports: [
+      ConfigModule.forRoot({
+        isGlobal: true,
+      }),
+      ThrottlerModule.forRoot({
+        ttl: 60,
+        limit: 10,
+      }),
+      CacheModule.register(),
+      TypeOrmModule.forRoot({
     type: 'postgres',
     host: 'localhost',
     port: 5432,
@@ -22,7 +33,12 @@ import { Prayer } from './prayer/entities/prayer.entity';
     autoLoadEntities: true,
     // entities: [Auth, User, Prayer],
     synchronize: true,
-  }), AuthModule, UsersModule, SermonModule, PrayerModule, BibleStudyModule],
+  }),
+    AuthModule,
+    UsersModule,
+    SermonModule,
+    PrayerModule,
+    BibleStudyModule],
   controllers: [AppController],
   providers: [AppService],
 })
